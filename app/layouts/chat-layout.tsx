@@ -1,5 +1,5 @@
 import { LogOut, X } from "lucide-react";
-import { Form, Outlet, redirect } from "react-router";
+import { Form, Link, Outlet, redirect } from "react-router";
 import { ContactInformationCard } from "~/chat/components/contact-information-card";
 import { ContactList } from "~/chat/components/contact-list";
 import { Button } from "~/components/ui/button";
@@ -13,11 +13,12 @@ export async function loader({ request }: Route.LoaderArgs) {
     return redirect("/auth/login");
   }
   const clients = await getClients();
-  return { clients };
+  const username = session.get("name") || "Guest";
+  return { clients, username };
 }
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { clients } = loaderData;
+  const { clients, username } = loaderData;
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
@@ -25,7 +26,9 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
         <div className="p-4 border-b">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-full bg-primary" />
-            <span className="font-semibold">NexTalk</span>
+            <Link to={`/chat`} className="font-semibold">
+              {username}
+            </Link>
           </div>
         </div>
         <ContactList clients={clients} />
