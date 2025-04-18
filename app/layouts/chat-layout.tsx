@@ -3,8 +3,16 @@ import { Outlet } from "react-router";
 import { ContactInformationCard } from "~/chat/components/contact-information-card";
 import { ContactList } from "~/chat/components/contact-list";
 import { Button } from "~/components/ui/button";
+import { getClients } from "~/fake/fake-data";
+import type { Route } from "./+types/chat-layout";
 
-export default function Layout() {
+export async function loader() {
+  const clients = await getClients();
+  return { clients };
+}
+
+export default function Layout({ loaderData }: Route.ComponentProps) {
+  const { clients } = loaderData;
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
@@ -15,7 +23,7 @@ export default function Layout() {
             <span className="font-semibold">NexTalk</span>
           </div>
         </div>
-        <ContactList />
+        <ContactList clients={clients} />
         <div className="p-4 border-t">
           <Button className="w-full">
             <LogOut /> logout
