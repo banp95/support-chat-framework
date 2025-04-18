@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { data, Form, Link, redirect, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
@@ -29,11 +30,23 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (email === "Josber11@hotmail.com") {
     session.flash("error", "Invalid Email");
-    return redirect("/auth/login?error=Invalid Email", {
-      headers: {
-        "Set-Cookie": await commitSession(session),
+    // return redirect("/auth/login?error=Invalid Email", {
+    //   headers: {
+    //     "Set-Cookie": await commitSession(session),
+    //   },
+    // });
+    return data(
+      {
+        error: "Invalid Email",
       },
-    });
+      {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+        status: 400,
+        statusText: "Bad Request",
+      }
+    );
   }
 
   session.set("userId", "U1-12345");
@@ -46,11 +59,19 @@ export async function action({ request }: Route.ActionArgs) {
     },
   });
 }
-export default function LoginPage() {
+export default function LoginPage({ actionData }: Route.ComponentProps) {
   const navigation = useNavigate();
   const onAppleSingIn = () => {
     navigation("/aut/testing", { replace: true });
   };
+
+  useEffect(() => {
+    if (actionData?.error) {
+      // Show error message to the user
+      alert(actionData.error);
+    }
+  }, [actionData]);
+
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card className="overflow-hidden p-0">
