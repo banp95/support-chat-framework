@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink, useParams } from "react-router";
 import { Button, buttonVariants } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import type { Client } from "~/interfaces/chat.interface";
@@ -6,6 +6,7 @@ interface Props {
   clients: Client[];
 }
 export const ContactList = ({ clients }: Props) => {
+  const { id } = useParams();
   return (
     <ScrollArea className="h-[calc(100vh-134px)]">
       <div className="space-y-4 p-4">
@@ -15,12 +16,12 @@ export const ContactList = ({ clients }: Props) => {
             {clients.map((client) => (
               <NavLink
                 key={client.id}
-                className={({ isActive }) =>
+                className={({ isActive, isPending }) =>
                   buttonVariants({
                     variant: "ghost",
                     className: `w-full justify-start text-gray-500 ${
                       isActive && "bg-gray-100 text-gray-900"
-                    }`,
+                    } ${isPending && "bg-gray-200 text-gray-900"}`,
                   })
                 }
                 to={`/chat/client/${client.id}`}
@@ -29,7 +30,13 @@ export const ContactList = ({ clients }: Props) => {
                   {client.name.charAt(0).toUpperCase()}
                   {client.name.split(" ")[1]?.charAt(0).toUpperCase() || ""}
                 </div>
-                {client.name}
+                <span
+                  className={`text-sm font-medium text-gray-900 ${
+                    id === client.id ? "font-semibold" : ""
+                  }`}
+                >
+                  {client.name}
+                </span>
               </NavLink>
             ))}
           </div>
