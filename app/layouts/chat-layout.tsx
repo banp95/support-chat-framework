@@ -3,22 +3,28 @@ import { Form, Link, Outlet, redirect } from "react-router";
 import { ContactInformationCard } from "~/chat/components/contact-information-card";
 import { ContactList } from "~/chat/components/contact-list";
 import { Button } from "~/components/ui/button";
-import { getClients } from "~/fake/fake-data";
+import { getClient, getClients } from "~/fake/fake-data";
 import { getSession } from "~/sessions.server";
 import type { Route } from "./+types/chat-layout";
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await getSession(request.headers.get("Cookie"));
+
+  const username = session.get("name") || "Guest";
+  const { id } = params;
   if (!session.has("userId")) {
     return redirect("/auth/login");
   }
   const clients = await getClients();
-  const username = session.get("name") || "Guest";
-  return { clients, username };
+  if (id) {
+    const client = await getClient(id);
+    return { clients, username, client };
+  }
+  return { clients: [], username };
 }
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
-  const { clients, username } = loaderData;
+  const { clients, username, client } = loaderData;
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
